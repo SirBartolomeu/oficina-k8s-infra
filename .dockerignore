@@ -1,9 +1,0 @@
-﻿**/bin/
-**/obj/
-**/.vs/
-**/*.db
-**/*.db-shm
-**/*.db-wal
-.git/
-.dotnet_home/
-security-report/
