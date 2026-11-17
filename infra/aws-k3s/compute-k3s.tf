@@ -53,5 +53,10 @@ resource "aws_instance" "k3s" {
 
   tags = { Name = "${var.name_prefix}-k3s" }
 
+  # SSM's "latest" AMI advances independently and must not replace the running demo node on refresh.
+  lifecycle {
+    ignore_changes = [ami]
+  }
+
   depends_on = [aws_iam_role_policy_attachment.k3s_ssm]
 }

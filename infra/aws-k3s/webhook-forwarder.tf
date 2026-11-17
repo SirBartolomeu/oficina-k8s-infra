@@ -5,6 +5,11 @@ resource "aws_security_group" "webhook_forwarder" {
   ingress     = []
   egress      = []
   tags        = { Name = "${var.name_prefix}-webhook-forwarder" }
+
+  # Egress is managed by aws_vpc_security_group_egress_rule to avoid rule drift.
+  lifecycle {
+    ignore_changes = [egress]
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "webhook_forwarder_to_billing" {
