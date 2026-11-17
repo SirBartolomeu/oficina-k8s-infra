@@ -34,6 +34,10 @@ output "auth_token_url" {
   value = "${aws_apigatewayv2_api.auth.api_endpoint}/auth/token"
 }
 
+output "mercado_pago_webhook_url" {
+  value = "${aws_apigatewayv2_api.auth.api_endpoint}/webhooks/mercado-pago/orders"
+}
+
 # Bootstrap packaging reads one consolidated output set from the K3s state.
 output "rds_endpoint" {
   value = local.data_outputs.rds_endpoint
