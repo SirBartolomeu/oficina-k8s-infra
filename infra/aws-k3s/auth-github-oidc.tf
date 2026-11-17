@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "github_auth_assume" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
     }
     condition {
       test     = "StringEquals"
@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "github_auth_assume" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_owner}/${var.github_auth_repository}:ref:refs/heads/main"]
+      values   = ["repo:${var.github_owner}@${var.github_owner_id}/${var.github_auth_repository}@${var.github_repository_ids["auth"]}:ref:refs/heads/main"]
     }
   }
 }
