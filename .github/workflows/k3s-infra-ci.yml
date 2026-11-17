@@ -3,7 +3,7 @@ name: k3s-infra-ci
 on:
   push:
     branches: [main]
-    paths: ['infra/aws-k3s/**', 'services/Oficina.Auth/**', 'scripts/aws-demo/build-auth-lambda.ps1', '.github/workflows/k3s-infra-ci.yml']
+    paths: ['infra/aws-k3s/**', 'services/Oficina.Auth/**', 'services/Oficina.WebhookForwarder/**', 'services/Oficina.WebhookForwarder.Tests/**', 'scripts/aws-demo/build-auth-lambda.ps1', 'scripts/aws-demo/build-webhook-forwarder.ps1', '.github/workflows/k3s-infra-ci.yml']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -28,6 +28,11 @@ jobs:
       - name: Build initial Auth package
         shell: pwsh
         run: ./scripts/aws-demo/build-auth-lambda.ps1 -OutputPath infra/aws-k3s/artifacts/oficina-auth.zip
+      - name: Test webhook forwarder
+        run: dotnet test services/Oficina.WebhookForwarder.Tests --configuration Release --logger trx
+      - name: Build webhook forwarder package
+        shell: pwsh
+        run: ./scripts/aws-demo/build-webhook-forwarder.ps1 -OutputPath infra/aws-k3s/artifacts/oficina-webhook-forwarder.zip
       - run: terraform -chdir=infra/aws-k3s fmt -check
       - run: terraform -chdir=infra/aws-k3s init -backend=false -input=false
       - run: terraform -chdir=infra/aws-k3s validate
@@ -48,6 +53,9 @@ jobs:
       - name: Build initial Auth package
         shell: pwsh
         run: ./scripts/aws-demo/build-auth-lambda.ps1 -OutputPath infra/aws-k3s/artifacts/oficina-auth.zip
+      - name: Build webhook forwarder package
+        shell: pwsh
+        run: ./scripts/aws-demo/build-webhook-forwarder.ps1 -OutputPath infra/aws-k3s/artifacts/oficina-webhook-forwarder.zip
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_INFRA_K3S }}
@@ -78,6 +86,7 @@ jobs:
             infra/aws-k3s/plan.tfplan
             infra/aws-k3s/plan.txt
             infra/aws-k3s/artifacts/oficina-auth.zip
+            infra/aws-k3s/artifacts/oficina-webhook-forwarder.zip
           retention-days: 1
 
   deploy:
@@ -97,6 +106,8 @@ jobs:
           path: infra/aws-k3s
       - name: Verify planned Auth package
         run: test -s infra/aws-k3s/artifacts/oficina-auth.zip
+      - name: Verify planned webhook forwarder package
+        run: test -s infra/aws-k3s/artifacts/oficina-webhook-forwarder.zip
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_INFRA_K3S }}
