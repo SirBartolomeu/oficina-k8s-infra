@@ -39,6 +39,15 @@ resource "aws_vpc_security_group_ingress_rule" "secrets_endpoint_from_auth" {
   description                  = "Secrets Manager somente da Lambda CPF"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "secrets_endpoint_from_k3s" {
+  security_group_id            = aws_security_group.auth_secrets_endpoint.id
+  referenced_security_group_id = local.data_outputs.k3s_security_group_id
+  ip_protocol                  = "tcp"
+  from_port                    = 443
+  to_port                      = 443
+  description                  = "Secrets Manager para bootstrap dos workloads K3s"
+}
+
 resource "aws_vpc_endpoint" "auth_secrets" {
   vpc_id              = local.data_outputs.vpc_id
   service_name        = "com.amazonaws.${var.aws_region}.secretsmanager"
