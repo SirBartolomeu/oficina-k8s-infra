@@ -6,7 +6,6 @@ on:
     paths: ['infra/aws-k3s/**', 'services/Oficina.Auth/**', 'scripts/aws-demo/build-auth-lambda.ps1', '.github/workflows/k3s-infra-ci.yml']
   pull_request:
     branches: [main]
-    paths: ['infra/aws-k3s/**', 'services/Oficina.Auth/**', 'scripts/aws-demo/build-auth-lambda.ps1', '.github/workflows/k3s-infra-ci.yml']
   workflow_dispatch:
     inputs:
       deploy:
